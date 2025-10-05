@@ -45,6 +45,8 @@ Will create these 3 commits with those files respectively
   zig-out/kire.log
 ```
 
+Feel free to file issues for other features 
+
 
 ## Building from Source
 
