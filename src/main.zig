@@ -1,7 +1,8 @@
 const std = @import("std");
 
-const parser = @import("core/parser.zig");
+const commandParser = @import("core/command_parser.zig");
 const commandRunner = @import("core/command_runner.zig");
+const optionsParser = @import("core/options_parser.zig");
 
 const commands = struct {
     const commit = @import("commands/commit.zig").run;
@@ -15,20 +16,28 @@ pub fn main() !void {
     const allocator = gpa.allocator();
     defer _ = gpa.deinit();
 
-    const cmd = try parser.parseArgs(allocator, &argsIter);
+    const cmd = try commandParser.parseArgs(allocator, &argsIter);
+    const options = try optionsParser.parseOptions(allocator);
+
     const terminalCommands: []const []const u8 = cmds: {
         switch (cmd) {
             .Commit => |commitArgs| {
                 defer allocator.free(commitArgs);
-                break :cmds try commands.commit(allocator, commitArgs);
+                break :cmds try commands.commit(allocator, commitArgs, options);
             },
             .Unknown => {
-                std.debug.print("Unknown command detected", .{});
-                break :cmds &[_][]const u8{};
+                std.debug.print("Unknown command detected\n", .{});
+                return;
             },
         }
     };
-    defer allocator.free(terminalCommands);
 
     try commandRunner.run(allocator, terminalCommands);
+
+    allocator.free(terminalCommands);
+    for (options.packages) |package| {
+        allocator.free(package.packageName);
+        allocator.free(package.packagePath);
+    }
+    allocator.free(options.packages);
 }

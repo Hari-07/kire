@@ -1,0 +1,6 @@
+# This is an example kire.toml file
+
+[packages]
+api = "packages/api"
+web = "packages/web"
+shared = "packages/shared"

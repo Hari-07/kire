@@ -41,6 +41,9 @@ pub fn build(b: *std.Build) void {
     //     .target = target,
     // });
 
+    const toml_dep = b.dependency("toml", .{});
+    const toml_module = toml_dep.module("toml");
+
     // Here we define an executable. An executable needs to have a root module
     // which needs to expose a `main` function. While we could add a main function
     // to the module defined above, it's sometimes preferable to split business
@@ -57,6 +60,7 @@ pub fn build(b: *std.Build) void {
     //
     // If neither case applies to you, feel free to delete the declaration you
     // don't need and to put everything under a single module.
+    //
     const exe = b.addExecutable(.{
         .name = "kire",
         .root_module = b.createModule(.{
@@ -72,14 +76,14 @@ pub fn build(b: *std.Build) void {
             .optimize = optimize,
             // List of modules available for import in source files part of the
             // root module.
-            // .imports = &.{
-            //     // Here "kire" is the name you will use in your source code to
-            //     // import this module (e.g. `@import("kire")`). The name is
-            //     // repeated because you are allowed to rename your imports, which
-            //     // can be extremely useful in case of collisions (which can happen
-            //     // importing modules from different packages).
-            //     .{ .name = "kire", .module = mod },
-            // },
+            .imports = &.{
+                // Here "kire" is the name you will use in your source code to
+                // import this module (e.g. `@import("kire")`). The name is
+                // repeated because you are allowed to rename your imports, which
+                // can be extremely useful in case of collisions (which can happen
+                // importing modules from different packages).
+                .{ .name = "toml", .module = toml_module },
+            },
         }),
     });
 

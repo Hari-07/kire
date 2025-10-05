@@ -14,14 +14,14 @@ pub fn parseArgs(allocator: std.mem.Allocator, argsIter: *std.process.ArgIterato
     };
 
     if (str.stringEquals(command, "commit")) {
-        var args = std.ArrayList([]const u8).empty;
-        defer args.deinit(allocator);
+        var args = std.ArrayList([]const u8).init(allocator);
+        defer args.deinit();
 
         while (argsIter.next()) |arg| {
-            try args.append(allocator, arg);
+            try args.append(arg);
         }
 
-        return Command{ .Commit = try args.toOwnedSlice(allocator) };
+        return Command{ .Commit = try args.toOwnedSlice() };
     }
 
     return Command{ .Unknown = command };
